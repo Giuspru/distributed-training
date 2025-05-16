@@ -19,9 +19,15 @@ L’infrastruttura del progetto è composta da:
 
 Il masternode svolgerà il ruolo di control plane del cluster Kubernetes, mentre i due nodi worker1 e worker2 ricopriranno il ruolo di workersnode.
 
-### 1.1 Installazione di Kubernetes:
-Per installare Kubernetes sul cluster di macchine virtuali è stato utilizzato il tool rke2, dando il comando:  (spiegazione breve di rke2). 
+### 1.1 Installazione di Kubernetes con rke2 & avvio del servizio:
+- Per installare Kubernetes sul cluster di macchine virtuali è stato utilizzato il tool rke2, dando il comando:  (spiegazione breve di rke2). 
 ```curl -sfL https://get.rke2.io/ | INSTALL_RKE2_TYPE=server sh -```
+
+- Per abilitare il servizio utilizzando rke2, e successivamente metterlo in atto vengono dati i due comandi: 
+
+```systemctl enable rke2-server.service```
+```systemctl start rke2-server.service```
+
 
 
 
