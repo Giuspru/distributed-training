@@ -1,14 +1,14 @@
 Step 1 - Creazione cluster k8s
 
 Abbiamo creato due VMs su INFN Cloud con i seguenti hostnames:
-	- vnode0 (212.189.145.22)
-	- vnode1 (212.189.145.15)
+	- masternode (192.168.122.33) 10 CPUs 22GB ram
+	- worker1 (192.168.122.22) 8 CPUs 17GB ram
+	- worker2 (192.168.122.94) 8 CPUs 17GB ram
 
-vnode0 sara' il control plane di k8s mentre vnode1 sara' un worker node.
-Per quanto riguarda il control plane, abbiamo aperto la porta 6443/TCP per 
-poter fare il join del nodo vnode1 al cluster e la porta 9345 che serve a rke2.
+masternode sara' il control plane di k8s mentre worker1, worker2 saranno un worker node.
+Essendo tre VMs in un ambiente "protetto" in cui nello stesso server (che ha 512 gb di ram e 96 core) non e' necessario aprire porte.
 
-Su vnode0 installiamo k8s con rke2
+Su masternode installiamo k8s con rke2
 
 curl -sfL https://get.rke2.io/ | INSTALL_RKE2_TYPE=server sh -
 
@@ -32,7 +32,7 @@ Possiamo vedere i nodi del cluster
 L'output dovrebbe essere qualcosa simile a
 
 NAME                 STATUS   ROLES                       AGE   VERSION
-vnode0.localdomain   Ready    control-plane,etcd,master   17m   v1.31.8+rke2r1
+masternode0.localdomain   Ready    control-plane,etcd,master   17m   v1.31.8+rke2r1
 
 Che ci indica lo stato del nodo control plane (Ready)
 
@@ -72,7 +72,7 @@ sudo cat /var/lib/rancher/rke2/server/node-token
 
 --------------------------------------------------------------------
 
-Sul worker node, installiamo rke2 agent
+Sui worker nodes, installiamo rke2 agent
 
 curl -sfL https://get.rke2.io/ | INSTALL_RKE2_TYPE=agent sh -
 
@@ -83,7 +83,7 @@ sudo mkdir -p /etc/rancher/rke2
 Ed infine il file di configurazione config.yaml
 
 sudo tee /etc/rancher/rke2/config.yaml > /dev/null <<EOF
-server: https://212.189.145.22:9345
+server: https://192.168.122.33:9345
 token: K10aca9023f14ec740f69a6f15659aac21d56b8631d93f2b417c51111fd89e640cf::server:1a7560a20238099cd225b0aa3def7cb6
 EOF
 
