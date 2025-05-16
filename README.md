@@ -12,14 +12,16 @@ L’infrastruttura del progetto è composta da:
 
  # Implementazione Infrastrutturale: 
  ## 1. Cluster Kubernetes:
- Sono state create due VMs su di un Server privato, con i seguenti hostname:
+ In prima istanza sono state create tre macchine virtuali su di un Server privato, con i seguenti hostname:
  - **masternode** (192.168.122.33) con: 10 CPUs & 22Gb di Ram
  - **workernode1** (192.168.122.22) con: 8 CPUs & 17Gb di RAM
  - **workernode2** (192.168.122.94) con: 8 CPUs & 17Gb di RAM
 
 Il masternode svolgerà il ruolo di control plane del cluster Kubernetes, mentre i due nodi worker1 e worker2 ricopriranno il ruolo di workersnode.
 
-
+### 1.1 Installazione di Kubernetes:
+Per installare Kubernetes sul cluster di macchine virtuali è stato utilizzato il tool rke2, dando il comando:  (spiegazione breve di rke2). 
+```curl -sfL https://get.rke2.io/ | INSTALL_RKE2_TYPE=server sh -```
 
 
 
