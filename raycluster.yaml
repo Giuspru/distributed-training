@@ -1,0 +1,40 @@
+apiVersion: ray.io/v1
+kind: RayCluster
+metadata:
+  name: mnist-raycluster
+spec:
+  rayVersion: "2.6.0"
+
+  headGroupSpec:
+    rayStartParams:                     # <‑‑‑‑‑ required (can be blank)
+      dashboard-host: "0.0.0.0"         #   a common head‑node flag
+    template:
+      spec:
+        serviceAccountName: ray
+        containers:
+        - name: head
+          image: biancoj/peppe-train:0.1.0
+          resources:
+            limits:
+              cpu: "1"
+              memory: "1Gi"
+          envFrom:
+          - secretRef:
+              name: minio-credentials
+
+  workerGroupSpecs:
+  - groupName: workers
+    replicas: 1
+    rayStartParams: {}                  # <‑‑‑‑‑ required, empty is fine
+    template:
+      spec:
+        containers:
+        - name: worker
+          image: biancoj/peppe-train:0.1.0
+          resources:
+            limits:
+              cpu: "1"
+              memory: "1Gi"
+          envFrom:
+          - secretRef:
+              name: minio-credentials

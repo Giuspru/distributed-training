@@ -1,0 +1,192 @@
+Step 1 - Creazione cluster k8s
+
+Abbiamo creato due VMs su INFN Cloud con i seguenti hostnames:
+	- vnode0 (212.189.145.22)
+	- vnode1 (212.189.145.15)
+
+vnode0 sara' il control plane di k8s mentre vnode1 sara' un worker node.
+Per quanto riguarda il control plane, abbiamo aperto la porta 6443/TCP per 
+poter fare il join del nodo vnode1 al cluster e la porta 9345 che serve a rke2.
+
+Su vnode0 installiamo k8s con rke2
+
+curl -sfL https://get.rke2.io/ | INSTALL_RKE2_TYPE=server sh -
+
+Successivamente, abilitiamo e startiamo il servizio di rke2
+
+systemctl enable rke2-server.service
+systemctl start rke2-server.service
+
+Una volta partito il servizio di rke2 il kubeconfig si trova
+
+/etc/rancher/rke2/rke2.yaml
+
+quindi, esportando la env variable KUBECONFIG
+
+export KUBECONFIG=/etc/rancher/rke2/rke2.yaml
+
+Possiamo vedere i nodi del cluster
+
+/var/lib/rancher/rke2/bin/kubectl get nodes
+
+L'output dovrebbe essere qualcosa simile a
+
+NAME                 STATUS   ROLES                       AGE   VERSION
+vnode0.localdomain   Ready    control-plane,etcd,master   17m   v1.31.8+rke2r1
+
+Che ci indica lo stato del nodo control plane (Ready)
+
+Con 
+
+/var/lib/rancher/rke2/bin/kubectl get pods -A 
+
+vediamo tutti i PODs del cluster
+
+NAMESPACE     NAME                                                    READY   STATUS      RESTARTS   AGE
+kube-system   cloud-controller-manager-vnode0.localdomain             1/1     Running     0          18m
+kube-system   etcd-vnode0.localdomain                                 1/1     Running     0          17m
+kube-system   helm-install-rke2-canal-8686c                           0/1     Completed   0          18m
+kube-system   helm-install-rke2-coredns-m7m2s                         0/1     Completed   0          18m
+kube-system   helm-install-rke2-ingress-nginx-r69vz                   0/1     Completed   0          18m
+kube-system   helm-install-rke2-metrics-server-4kjdp                  0/1     Completed   0          18m
+kube-system   helm-install-rke2-runtimeclasses-xcdqz                  0/1     Completed   0          18m
+kube-system   helm-install-rke2-snapshot-controller-crd-d454l         0/1     Completed   0          18m
+kube-system   helm-install-rke2-snapshot-controller-fvzd8             0/1     Completed   2          18m
+kube-system   kube-apiserver-vnode0.localdomain                       1/1     Running     0          18m
+kube-system   kube-controller-manager-vnode0.localdomain              1/1     Running     0          18m
+kube-system   kube-proxy-vnode0.localdomain                           1/1     Running     0          18m
+kube-system   kube-scheduler-vnode0.localdomain                       1/1     Running     0          18m
+kube-system   rke2-canal-6sw6p                                        2/2     Running     0          18m
+kube-system   rke2-coredns-rke2-coredns-869cb5bf57-j54hs              1/1     Running     0          18m
+kube-system   rke2-coredns-rke2-coredns-autoscaler-5b89b754bd-9qjqd   1/1     Running     0          18m
+kube-system   rke2-ingress-nginx-controller-ldspb                     1/1     Running     0          17m
+kube-system   rke2-metrics-server-58ff89f9c7-vw4hv                    1/1     Running     0          17m
+kube-system   rke2-snapshot-controller-58dbcfd956-p2qs7               1/1     Running     0          17m
+
+*nota - potrebbe essere necessario dare i permessi di lettura del file /etc/rancher/rke2/rke2.yaml
+per comodita ho eseguito il comando
+
+sudo chmod 777 /etc/rancher/rke2/rke2.yaml
+
+sudo cat /var/lib/rancher/rke2/server/node-token
+
+--------------------------------------------------------------------
+
+Sul worker node, installiamo rke2 agent
+
+curl -sfL https://get.rke2.io/ | INSTALL_RKE2_TYPE=agent sh -
+
+Creiamo sucessivamente la cartella
+
+sudo mkdir -p /etc/rancher/rke2
+
+Ed infine il file di configurazione config.yaml
+
+sudo tee /etc/rancher/rke2/config.yaml > /dev/null <<EOF
+server: https://212.189.145.22:9345
+token: K10aca9023f14ec740f69a6f15659aac21d56b8631d93f2b417c51111fd89e640cf::server:1a7560a20238099cd225b0aa3def7cb6
+EOF
+
+Creato il file, e' necessario abilitare rke2 agent e farlo partire
+
+systemctl enable rke2-agent.service
+systemctl start rke2-agent.service
+
+Tornando sul control plane possiamo vedere i nodi del cluster
+
+/var/lib/rancher/rke2/bin/kubectl get nodes
+
+NAME                 STATUS   ROLES                       AGE   VERSION
+vnode0.localdomain   Ready    control-plane,etcd,master   23m   v1.31.8+rke2r1
+vnode1.localdomain   Ready    <none>                      97s   v1.31.8+rke2r1
+
+Che sono entrambi Ready (NON banale, perche' rke2 si occupa anche della configurazione della rete)
+In questo caso, rke2 utilizza Canal come plugin di rete. 
+
+---------------------------------------------------------------------
+
+Sul nodo control plane del cluster k8s installiamo helm (da dare una letta su cosa e')
+
+curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3
+chmod 700 get_helm.sh
+./get_helm.sh
+
+Con helm installiamo il kuberay operator (da studiare)
+
+helm repo add kuberay https://ray-project.github.io/kuberay-helm/
+helm repo update
+helm install kuberay-operator kuberay/kuberay-operator --version 1.3.0
+
+Completato il comando ed eseguendo di nuovo il comando per recupare i pods, vedermeo il pod che gestisce 
+il kuberay-operator
+
+NAMESPACE     NAME                                                    READY   STATUS      RESTARTS   AGE
+default       kuberay-operator-5c7f84f8bc-sr8d4                       1/1     Running     0          85s
+kube-system   cloud-controller-manager-vnode0.localdomain             1/1     Running     0          30m
+kube-system   etcd-vnode0.localdomain                                 1/1     Running     0          30m
+kube-system   helm-install-rke2-canal-8686c                           0/1     Completed   0          30m
+kube-system   helm-install-rke2-coredns-m7m2s                         0/1     Completed   0          30m
+kube-system   helm-install-rke2-ingress-nginx-r69vz                   0/1     Completed   0          30m
+kube-system   helm-install-rke2-metrics-server-4kjdp                  0/1     Completed   0          30m
+kube-system   helm-install-rke2-runtimeclasses-xcdqz                  0/1     Completed   0          30m
+kube-system   helm-install-rke2-snapshot-controller-crd-d454l         0/1     Completed   0          30m
+kube-system   helm-install-rke2-snapshot-controller-fvzd8             0/1     Completed   2          30m
+kube-system   kube-apiserver-vnode0.localdomain                       1/1     Running     0          30m
+kube-system   kube-controller-manager-vnode0.localdomain              1/1     Running     0          30m
+kube-system   kube-proxy-vnode0.localdomain                           1/1     Running     0          30m
+kube-system   kube-proxy-vnode1.localdomain                           1/1     Running     0          8m40s
+kube-system   kube-scheduler-vnode0.localdomain                       1/1     Running     0          30m
+kube-system   rke2-canal-6rd29                                        2/2     Running     0          9m9s
+kube-system   rke2-canal-6sw6p                                        2/2     Running     0          30m
+kube-system   rke2-coredns-rke2-coredns-869cb5bf57-j54hs              1/1     Running     0          30m
+kube-system   rke2-coredns-rke2-coredns-869cb5bf57-x9m85              1/1     Running     0          9m7s
+kube-system   rke2-coredns-rke2-coredns-autoscaler-5b89b754bd-9qjqd   1/1     Running     0          30m
+kube-system   rke2-ingress-nginx-controller-8bf6p                     1/1     Running     0          8m8s
+kube-system   rke2-ingress-nginx-controller-ldspb                     1/1     Running     0          29m
+kube-system   rke2-metrics-server-58ff89f9c7-vw4hv                    1/1     Running     0          30m
+kube-system   rke2-snapshot-controller-58dbcfd956-p2qs7               1/1     Running     0          29m
+
+---
+Upload MINST su MINIO
+
+Abbiamo configuto MINIO su un'altra macchina virtuale (sempre
+su INFN cloud con IP pubblico 131.154.98.45)
+
+ seguendo questo guida nel repo
+
+https://github.com/LucaPacioselli/MinIO-S3-setup/tree/main
+
+E fatto partire utilizzando Docker compose il minio server.
+
+Successivamente, ho scaricato il dataset mnist sul computer locale con il seguente script
+
+mkdir -p mnist
+cd mnist
+
+wget https://ossci-datasets.s3.amazonaws.com/mnist/train-images-idx3-ubyte.gz
+wget https://ossci-datasets.s3.amazonaws.com/mnist/train-labels-idx1-ubyte.gz
+wget https://ossci-datasets.s3.amazonaws.com/mnist/t10k-images-idx3-ubyte.gz
+wget https://ossci-datasets.s3.amazonaws.com/mnist/t10k-labels-idx1-ubyte.gz
+
+gunzip *.gz
+
+
+E abbiamo caricato il dataset su minio
+
+python3 buckethandler.py --endpoint  https://minio.131.154.98.45.myip.cloud.infn.it --bucket datasets upload --file mnist/train-images-idx3-ubyte
+python3 buckethandler.py --endpoint  https://minio.131.154.98.45.myip.cloud.infn.it --bucket datasets upload --file mnist/train-labels-idx1-ubyte
+python3 buckethandler.py --endpoint  https://minio.131.154.98.45.myip.cloud.infn.it --bucket datasets upload --file mnist/t10k-images-idx3-ubyte
+python3 buckethandler.py --endpoint  https://minio.131.154.98.45.myip.cloud.infn.it --bucket datasets upload --file mnist/t10k-labels-idx1-ubyte
+
+
+kubectl -n default create secret generic minio-credentials --from-literal=AWS_ACCESS_KEY_ID=access_id --from-literal=AWS_SECRET_ACCESS_KEY=access_key --from-literal=AWS_ENDPOINT_URL=https://minio.131.154.98.45.myip.cloud.infn.it --from-literal=AWS_REGION=us-east-1
+
+sul nodo master
+
+curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3
+chmod 700 get_helm.sh
+./get_helm.sh
+
+helm repo add kuberay https://ray-project.github.io/kuberay-helm/
+helm install kuberay kuberay/kuberay-operator
+

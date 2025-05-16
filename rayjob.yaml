@@ -1,0 +1,18 @@
+apiVersion: ray.io/v1
+kind: RayJob
+metadata:
+  name: mnist-rayjob
+spec:
+  entrypoint: |
+    python /app/train_mnist_ray.py --epochs 5 --batch-size 64
+  clusterSelector:
+    ray.io/cluster: mnist-raycluster
+  submitterPodTemplate:
+    spec:
+      restartPolicy: Never
+      #nodeName: vnode1.localdomain
+      containers:
+      - name: submitter
+        image: biancoj/peppe-train:0.1.0
+        envFrom: [{secretRef: {name: minio-credentials}}]
+        
