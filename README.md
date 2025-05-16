@@ -25,8 +25,8 @@ Il masternode svolgerà il ruolo di control plane del cluster Kubernetes, mentre
 
 - Per abilitare il servizio utilizzando rke2, e successivamente metterlo in atto vengono dati i due comandi: 
 
-- ```systemctl enable rke2-server.service```
-- ```systemctl start rke2-server.service```
+    - ```systemctl enable rke2-server.service```
+    - ```systemctl start rke2-server.service```
 
 
 
