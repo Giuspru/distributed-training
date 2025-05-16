@@ -10,6 +10,9 @@ L’infrastruttura del progetto è composta da:
  ![Logo del progetto](./img/img.png) 
 
 
+ 
+
+
 
 Scaletta dei vari steps fatti che devono esere ben spiegati per esame:
 - [ ] Spiega BuildingLuster.txt e DockerFile
