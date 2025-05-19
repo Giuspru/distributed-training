@@ -101,6 +101,55 @@ immagine di output.
 ![output1](./img/)
 
 
+# 2. Configurazione MinIO e caricamento del dataset MNIST:
+Abbiamo configuto MINIO su un'altra macchina virtuale (sempresu INFN cloud con IP pubblico 131.154.98.45)
+
+seguendo questo guida nel repo:
+https://github.com/LucaPacioselli/MinIO-S3-setup/tree/main
+
+E fatto partire il minio server utilizzando Docker compose.
+
+Si è scaricato il dataset MNIST localmente con i comandi: 
+
+<pre lang="markdown">
+mkdir -p mnist
+cd mnist
+
+wget https://ossci-datasets.s3.amazonaws.com/mnist/train-images-idx3-ubyte.gz
+wget https://ossci-datasets.s3.amazonaws.com/mnist/train-labels-idx1-ubyte.gz
+wget https://ossci-datasets.s3.amazonaws.com/mnist/t10k-images-idx3-ubyte.gz
+wget https://ossci-datasets.s3.amazonaws.com/mnist/t10k-labels-idx1-ubyte.gz
+
+gunzip *.gz
+</pre>
+
+Ed si è caricato il dataset su MinIO utilizzando i seguenti comandi: 
+<pre lang="markdown">
+python3 buckethandler.py --endpoint  https://minio.131.154.98.45.myip.cloud.infn.it --bucket datasets upload --file mnist/train-images-idx3-ubyte
+python3 buckethandler.py --endpoint  https://minio.131.154.98.45.myip.cloud.infn.it --bucket datasets upload --file mnist/train-labels-idx1-ubyte
+python3 buckethandler.py --endpoint  https://minio.131.154.98.45.myip.cloud.infn.it --bucket datasets upload --file mnist/t10k-images-idx3-ubyte
+python3 buckethandler.py --endpoint  https://minio.131.154.98.45.myip.cloud.infn.it --bucket datasets upload --file mnist/t10k-labels-idx1-ubyte
+</pre>
+
+Questo non so cosa faccia: 
+<pre lang="markdown">
+kubectl -n default create secret generic minio-credentials --from-literal=AWS_ACCESS_KEY_ID=access_id --from-literal=AWS_SECRET_ACCESS_KEY=access_key --from-literal=AWS_ENDPOINT_URL=https://minio.131.154.98.45.myip.cloud.infn.it --from-literal=AWS_REGION=us-east-1
+</pre>
+
+
+sul nodo master: 
+
+<pre lang="markdown">
+curl -fsSL -o get_helm.sh https://raw.githubusercontent.comhelm/helm/main/scripts/get-helm-3 chmod 700 get_helm.sh
+./get_helm.sh
+</pre>
+
+<pre lang="markdown">
+helm repo add kuberay https://ray-project.github.io/kuberay-helm/
+helm install kuberay kuberay/kuberay-operator
+</pre>
+
+
 Scaletta dei vari steps fatti che devono esere ben spiegati per esame:
 - [ ] Spiega BuildingLuster.txt e DockerFile
 - [ ] Spiega i files che si torvano dentro il K8s folder
