@@ -54,6 +54,40 @@ Ottenendo così il seguente output:
 
 
 
+## Installazione di rke2 sui nodi worker:
+A questo punto è necessario installare rke2 sui nodi worker, (perchè? mi da delle migliorie?) eseguendo il comando: 
+
+```curl -sfL https://get.rke2.io/ | INSTALL_RKE2_TYPE=agent sh -```
+
+Successivamente viene creata la cartella rke2: ```sudo mkdir -p /etc/rancher/rke2```
+e il file di configurazione config.yaml: 
+
+``` sudo tee /etc/rancher/rke2/config.yaml > /dev/null <<EOF ````
+
+server: https://192.168.122.33:9345
+token: K10aca9023f14ec740f69a6f15659aac21d56b8631d93f2b417c51111fd89e640cf::server:1a7560a20238099cd225b0aa3def7cb6
+EOF ```
+
+
+Creato il file, e' necessario abilitare rke2 agent e farlo partire: 
+
+- ``` systemctl enable rke2-agent.service ```
+- ``` systemctl start rke2-agent.service ```
+
+Tornando sul control plane possiamo vedere i nodi del cluster: 
+ ![output1](./img/)  immagine dei vari nodi:
+
+ Che sono entrambi Ready (NON banale, perche' rke2 si occupa anche della configurazione della rete)
+In questo caso, rke2 utilizza Canal come plugin di rete. 
+
+
+### 1.2 Installazione di Helm:
+Sul nodo control plane del cluster k8s installiamo helm (da dare una letta su cosa e')
+
+ <pre lang="markdown"> ```curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3
+chmod 700 get_helm.sh
+./get_helm.sh  ```</pre>
+
 
 
 
