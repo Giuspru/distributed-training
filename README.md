@@ -84,9 +84,9 @@ In questo caso, rke2 utilizza Canal come plugin di rete.
 ### 1.2 Installazione di Helm:
 Sul nodo control plane del cluster k8s installiamo helm (da dare una letta su cosa e')
 
- <pre lang="markdown"> ```curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3
+ <pre lang="markdown">curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3
 chmod 700 get_helm.sh
-./get_helm.sh  ```</pre>
+./get_helm.sh</pre>
 
 
 
