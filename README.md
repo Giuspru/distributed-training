@@ -28,6 +28,22 @@ Il masternode svolgerà il ruolo di control plane del cluster Kubernetes, mentre
     - ```systemctl enable rke2-server.service```
     - ```systemctl start rke2-server.service```
 
+Una volta installato il servizio, il kubeconfig (spiegare cosa sia e a cosa serve) viene salvato nella directory seguente: ```/etc/rancher/rke2/rke2.yaml```
+E' necessario a questo punto esportare la variabile d'ambiente KUBECONFIG (perchè?) con il cpmando: 
+
+- ```export KUBECONFIG=/etc/rancher/rke2/rke2.yaml```
+
+Avendo esportato la variabile d'ambiente KUBECONFIG, è ora possibie eseguoire tutti i comandi di kubectl per interagire con il cluster senza dover specificare ogni volta il path del kubeconfig, passando da: 
+
+- ```/var/lib/rancher/rke2/bin/kubectl get nodes```
+
+a 
+
+- ```kubectl get nodes```
+
+In queto caso l'output ottenuto è il seguente:
+
+<pre lang="markdown"> ```bash kubectl get nodes ``` ``` NAME STATUS ROLES AGE VERSION masternode0.localdomain Ready control-plane,etcd,master 17m v1.31.8+rke2r1 ``` </pre>
 
 
 
