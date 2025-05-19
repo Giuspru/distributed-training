@@ -1,4 +1,7 @@
 
+![Logo del progetto](./img/img1.png) 
+# Introduzione
+
 Come descritto nel file README.md relativo all'overview generale, l'obiettivo del progetto è eseguire un training distribuito e il test di un modello di machine learning utilizzando il dataset MNIST.
 Per gestire correttamente i dati, garantire una connessione stabile tra i vari nodi del cluster e il server di storage, nonché per poter effettuare diverse operazioni sui bucket, è stato sviluppato lo script **buckethandler.py**.
 Questo script rappresenta uno strumento versatile per interagire in vari modi con un bucket esterno al cluster. In particolare, utilizza Boto3, una libreria Python che consente di comunicare con object storage compatibili con il protocollo S3, tecnologia proprietaria di AWS. Grazie a questa compatibilità, lo script può interfacciarsi anche con bucket MINIO, una soluzione open source per lo object storage che supporta lo stesso protocollo.
