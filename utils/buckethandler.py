@@ -1,12 +1,16 @@
-import boto3
+import boto3 # Libreria python che comunica con object storage s3: Minio crea oggetti bucketstorage che sono compatibili con protoocollo s3
 from botocore.exceptions import NoCredentialsError, PartialCredentialsError
 from botocore.config import Config
 
 class S3BucketHandler:
+
+    #init della classe, prende in ingresso un URL e il nome del bucket
     def __init__(self, endpoint_url, bucket_name):
         self.bucket_name = bucket_name
-        self.access_key = "key"
-        self.secret_key = "secret"
+        self.access_key = "key" # <-- inserire la key corretta per accedere all'endpoint
+        self.secret_key = "secret" # <-- inserire la secret key corretta per accedere all'endpoint
+        
+        #Creazione del client s3 
         try:
             self.s3_client = boto3.client(
                 's3',
@@ -17,6 +21,7 @@ class S3BucketHandler:
         except (NoCredentialsError, PartialCredentialsError) as e:
             print("Error: Invalid AWS credentials.", e)
 
+    # Metodo per ottenere tutti i file presenti nel bucket.
     def get_all_files(self):
         try:
             response = self.s3_client.list_objects_v2(Bucket=self.bucket_name)
@@ -40,6 +45,7 @@ class S3BucketHandler:
             return []
 
 
+    # Metodo per caricare dei files nel bucket.
     def upload_file(self, file_path, object_name=None):
         try:
             object_name = object_name or file_path.split('/')[-1]
@@ -48,6 +54,7 @@ class S3BucketHandler:
         except Exception as e:
             print("Error uploading file:", e)
 
+    # Metodo per scaricare files dal bucket.
     def download_file(self, object_name, file_path):
         try:
             print("Downloading file..., object_name: ", object_name)
@@ -57,6 +64,7 @@ class S3BucketHandler:
         except Exception as e:
             print("Error downloading file:", e)
 
+    # Metodo per cancellare files dal bucket.
     def delete_file(self, object_name):
         try:
             self.s3_client.delete_object(Bucket=self.bucket_name, Key=object_name)
@@ -64,6 +72,7 @@ class S3BucketHandler:
         except Exception as e:
             print("Error deleting file:", e)
 
+    # Metodo per ottenere le informazioni su un file specifico. Nome del Bucket e nome del file.
     def get_file_info(self, object_name):
         try:
             response = self.s3_client.head_object(Bucket=self.bucket_name, Key=object_name)
@@ -72,6 +81,7 @@ class S3BucketHandler:
             print("Error retrieving file info:", e)
 
 
+    # Metodo che restituisce la dimensione del bucket.
     def get_bucket_size(self):
         try:
             total_size = 0
@@ -108,6 +118,7 @@ class S3BucketHandler:
             return 0
 
 
+    # Metodo che cancella tutti i file presenti nel bucket.
     def clean_bucket(self):
         try:
             files = self.get_all_files()
