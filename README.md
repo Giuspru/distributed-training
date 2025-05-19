@@ -88,7 +88,17 @@ Sul nodo control plane del cluster k8s installiamo helm (da dare una letta su co
 chmod 700 get_helm.sh
 ./get_helm.sh</pre>
 
+Con helm installiamo il kuberay operator (da studiare): 
+<pre lang="markdown">
+helm repo add kuberay https://ray-project.github.io/kuberay-helm/
+helm repo update
+helm install kuberay-operator kuberay/kuberay-operator --version 1.3.0
+</pre>
 
+Completato il comando ed eseguendo di nuovo il comando per recupare i pods, vedermeo il pod che gestisce 
+il kuberay-operator: 
+immagine di output.
+![output1](./img/)
 
 
 Scaletta dei vari steps fatti che devono esere ben spiegati per esame:
