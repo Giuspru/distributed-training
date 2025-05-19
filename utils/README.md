@@ -1,5 +1,5 @@
 
-![Logo del progetto](./img/img1.png) 
+![Logo del progetto](./img/img1) 
 # Introduzione
 
 Come descritto nel file README.md relativo all'overview generale, l'obiettivo del progetto è eseguire un training distribuito e il test di un modello di machine learning utilizzando il dataset MNIST.
