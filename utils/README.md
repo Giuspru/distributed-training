@@ -30,13 +30,14 @@ Questa funzione Python, chiamata upload_file, serve per caricare un file su un b
 L'oggetto s3_client creato precedentemente utilizzando boto3.client('s3') utilizza il metodo upload_file, anche questo di boto3, per caricare il file specificato nel path di interesse nel bucket.
 
 <pre lang="markdown">
-    def upload_file(self, file_path, object_name=None):
-        try:
-            object_name = object_name or file_path.split('/')[-1]
-            self.s3_client.upload_file(file_path, self.bucket_name, object_name)
-            print(f"File {file_path} uploaded successfully as {object_name}.")
-        except Exception as e:
-            print("Error uploading file:", e)
+
+def upload_file(self, file_path, object_name=None):
+    try:
+        object_name = object_name or file_path.split('/')[-1]
+        self.s3_client.upload_file(file_path, self.bucket_name, object_name)
+        print(f"File {file_path} uploaded successfully as {object_name}.")
+    except Exception as e:
+        print("Error uploading file:", e)
 
 </pre>
 
