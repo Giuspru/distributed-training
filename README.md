@@ -41,9 +41,18 @@ a
 
 - ```kubectl get nodes```
 
-In queto caso l'output ottenuto è il seguente:
+In queto caso l'output ottenuto è il seguente: forsae qui è meglio metterci una piccola foto:
+ ``` NAME STATUS ROLES AGE VERSION masternode0.localdomain Ready control-plane,etcd,master 17m v1.31.8+rke2r1 ```
 
-<pre lang="markdown"> ```bash kubectl get nodes ``` ``` NAME STATUS ROLES AGE VERSION masternode0.localdomain Ready control-plane,etcd,master 17m v1.31.8+rke2r1 ``` </pre>
+Come è possibile notare dall'output il nodo master è stato creato correttamente, ed è pronto all'uso come possiamo evincere dal suo status "ready".
+
+E' possibile andare a vedere tutti i PODs del cluster con il comando: 
+
+- ```kubectl get pods -A```
+Ottenendo così il seguente output: 
+ ![output1](./img/img.png) 
+
+
 
 
 
