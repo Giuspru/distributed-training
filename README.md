@@ -109,7 +109,7 @@ https://github.com/LucaPacioselli/MinIO-S3-setup/tree/main
 
 E fatto partire il minio server utilizzando Docker compose.
 
-Si è scaricato il dataset MNIST localmente con i comandi: 
+Si è scaricato il dataset MNIST localmente (nel master?) con i comandi: 
 
 <pre lang="markdown">
 mkdir -p mnist

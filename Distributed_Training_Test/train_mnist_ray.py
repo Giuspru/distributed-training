@@ -17,11 +17,12 @@ from torch.utils.data.distributed import DistributedSampler # WIP dataset fino a
 # ───────── S3 + shard‐reassembly helpers ────────────────────────────────────
 
 
-S3_PREFIX = "s3://datasets/mninst" # <-- possible typing error here
+S3_PREFIX = "s3://datasets/mninst" 
 ENDPOINT  = os.getenv("AWS_ENDPOINT_URL") 
 REGION    = os.getenv("AWS_REGION", "us-east-1")
 
 s3_config = S3ClientConfig(force_path_style=True)
+
 
 def _download_and_concat(prefix: str) -> bytes:
     """List everything under `prefix`, drop xl.meta, sort the part files, and concat them."""
@@ -41,8 +42,8 @@ def _download_and_concat(prefix: str) -> bytes:
 
     buf = bytearray()
     for i in indices:
-        reader = ds._get_object(i)      # gets an S3Reader
-        buf.extend(reader.read())        # append that shard’s bytes
+        reader = ds._get_object(i)      
+        buf.extend(reader.read())        
     return bytes(buf)
 
 def _parse_idx_images(bytestream: bytes) -> np.ndarray:
