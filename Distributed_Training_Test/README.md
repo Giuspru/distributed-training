@@ -250,8 +250,25 @@ s3_client.upload_file(model_path, "models", "mnist/mnist.pt")
 </pre>
 
 ### 7. main();
+Nel main si trova la parte centrale della configurazione e dell'avvio del training distribuito mediante Ray. Utilizzando la classe TorchTrainer, viene avviato l'addestramento distribuito di un modello PyTorch in modo semplice e scalabile.
 
+In particolare, viene istanziato un oggetto trainer tramite la classe TorchTrainer, specificando come funzione di training la train_loop_per_worker. Questa funzione viene eseguita in parallelo da ciascun worker all'interno del job distribuito.
 
+Attraverso il parametro train_loop_config viene passato un dizionario contenente tutti gli iperparametri necessari al training, come il batch size, il learning rate e il numero di epoche.
+
+La distribuzione del training sui diversi nodi è gestita da ScalingConfig, che specifica il numero di worker da avviare (determinato dalla variabile d'ambiente RAY_NUM_WORKERS) e l'eventuale utilizzo della GPU. Ray si occuperà automaticamente di creare il numero di processi specificato e di distribuirli sui nodi disponibili, gestendo anche l'inizializzazione del contesto distribuito di PyTorch (torch.distributed).
+
+<pre lang="markdown">
+  trainer = TorchTrainer(
+        train_loop_per_worker,
+        train_loop_config={"bs": batch_size, "lr": 1e-3, "epochs": epochs},
+        scaling_config=ScalingConfig(
+            num_workers=int(os.getenv("RAY_NUM_WORKERS", 2)), 
+            use_gpu=torch.cuda.is_available(),
+        )
+    )
+
+</pre>
 
 ## Test del modello:
 

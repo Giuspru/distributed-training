@@ -154,7 +154,7 @@ if __name__ == "__main__":
     parser.add_argument("--epochs", type=int, default=5, help="Number of epochs")
     parser.add_argument("--batch-size", type=int, default=16, help="Batch size")
     args = parser.parse_args()
-    # Initialize Ray
+    
 
     epochs = args.epochs
     batch_size = args.batch_size
