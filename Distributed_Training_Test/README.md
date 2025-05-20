@@ -14,11 +14,13 @@ Il codice esegue un addestramento distribuito di un modello neurale sulla base M
 ### 1. setup_minio_connection():
 
 <pre lang="markdown">
+
 S3_PREFIX = "s3://datasets/mninst" 
 ENDPOINT  = os.getenv("AWS_ENDPOINT_URL") 
 REGION    = os.getenv("AWS_REGION", "us-east-1")
 
 s3_config = S3ClientConfig(force_path_style=True)
+
 </pre>
 
 Il codice configura l'accesso al bucket MINIO, definendo le variabili necessarie per la connessione.
@@ -74,20 +76,24 @@ Il file binario MNIST ha questa struttura:
     - tutti gli altri byte: valori che compongono le immagini
 
 la riga:
+
 <pre lang="markdown">
 
 magic, n, rows, cols = struct.unpack_from(">IIII", bytestream, 0)
 
 </pre>
+
 decodifica i primi 16 byte e li trasforma in una tupla (identificatore_img, numero immagini, numero rows, numero cols). 
 
 infine la riga di codice:
+
 <pre lang="markdown">
 
 data = np.frombuffer(bytestream, dtype=np.uint8, offset=16)
 return data.reshape(n, rows, cols)
 
 </pre>
+
 salta i primi 16 bytes dell'header legge i dati rimanenti come array flat (0-255), di dimensioni (n * rows * cols).
 Viene effettuato un reshape dell'array flat convertendolo in un tensore (n, rows, cols).
 
@@ -250,15 +256,16 @@ s3_client.upload_file(model_path, "models", "mnist/mnist.pt")
 </pre>
 
 ### 7. main();
-Nel main si trova la parte centrale della configurazione e dell'avvio del training distribuito mediante Ray. Utilizzando la classe TorchTrainer, viene avviato l'addestramento distribuito di un modello PyTorch in modo semplice e scalabile.
+Nel main si trova la parte centrale della configurazione e dell'avvio del training distribuito mediante Ray. Utilizzando la classe **TorchTrainer**, viene avviato l'addestramento distribuito di un modello **PyTorch** in modo semplice e scalabile.
 
-In particolare, viene istanziato un oggetto trainer tramite la classe TorchTrainer, specificando come funzione di training la train_loop_per_worker. Questa funzione viene eseguita in parallelo da ciascun worker all'interno del job distribuito.
+In particolare, viene istanziato un oggetto trainer tramite la classe **TorchTrainer**, specificando come funzione di training la **train_loop_per_worker**. Questa funzione viene eseguita in parallelo da ciascun worker all'interno del job distribuito.
 
-Attraverso il parametro train_loop_config viene passato un dizionario contenente tutti gli iperparametri necessari al training, come il batch size, il learning rate e il numero di epoche.
+Attraverso il parametro **train_loop_config** viene passato un dizionario contenente tutti gli iperparametri necessari al training, come il batch size, il learning rate e il numero di epoche.
 
-La distribuzione del training sui diversi nodi è gestita da ScalingConfig, che specifica il numero di worker da avviare (determinato dalla variabile d'ambiente RAY_NUM_WORKERS) e l'eventuale utilizzo della GPU. Ray si occuperà automaticamente di creare il numero di processi specificato e di distribuirli sui nodi disponibili, gestendo anche l'inizializzazione del contesto distribuito di PyTorch (torch.distributed).
+La distribuzione del training sui diversi nodi è gestita da **ScalingConfig**, che specifica il numero di worker da avviare (determinato dalla variabile d'ambiente **RAY_NUM_WORKERS**) e l'eventuale utilizzo della GPU. Ray si occuperà automaticamente di creare il numero di processi specificato e di distribuirli sui nodi disponibili, gestendo anche l'inizializzazione del contesto distribuito di PyTorch (torch.distributed).
 
 <pre lang="markdown">
+
   trainer = TorchTrainer(
         train_loop_per_worker,
         train_loop_config={"bs": batch_size, "lr": 1e-3, "epochs": epochs},
