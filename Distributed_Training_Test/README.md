@@ -35,13 +35,12 @@ Inizialmente viene creato un dataset s3 con il metodo S3MapDataset.from_prefix()
 
 <pre lang="markdown">
 
-    ds = S3MapDataset.from_prefix(
-        prefix,
-        region=REGION,
-        endpoint=ENDPOINT,
-        transform=None,
-        s3client_config=s3_config
-    )
+ds = S3MapDataset.from_prefix(
+    prefix,
+    region=REGION,
+    endpoint=ENDPOINT,
+    transform=None,
+    s3client_config=s3_config)
 
 </pre>
 
