@@ -71,14 +71,18 @@ Il file binario MNIST ha questa struttura:
 
 la riga:
 <pre lang="markdown">
+
 magic, n, rows, cols = struct.unpack_from(">IIII", bytestream, 0)
+
 </pre>
 decodifica i primi 16 byte e li trasforma in una tupla (identificatore_img, numero immagini, numero rows, numero cols). 
 
 infine la riga di codice:
 <pre lang="markdown">
+
 data = np.frombuffer(bytestream, dtype=np.uint8, offset=16)
 return data.reshape(n, rows, cols)
+
 </pre>
 salta i primi 16 bytes dell'header legge i dati rimanenti come array flat (0-255), di dimensioni (n * rows * cols).
 Viene effettuato un reshape dell'array flat convertendolo in un tensore (n, rows, cols).
@@ -96,19 +100,23 @@ La funzione sfrutta _download_and_concat, _parse_idx_images e _parse_idx_labels 
 Inizialmente viene costruito dinamicamente il path per raggiungere le imagini e le etichette nel  bucket MINIO. A seconda che si stia trattando il training set o il test set
 
 <pre lang="markdown">
+
 img_prefix = f"{S3_PREFIX}/{split}/{'train-images-idx3-ubyte' if split=='train' else 't10k-images-idx3-ubyte'}"
 (...)
 lbl_prefix = f"{S3_PREFIX}/{split}/{'train-labels-idx1-ubyte'  if split=='train' else 't10k-labels-idx1-ubyte'}"
+
 </pre>
 
 Ottenuti i path a cui riferirsi per il download delle immagini e delle etichette vengono chiamate le funzioni _download_and_concat, _parse_idx_images e _parse_idx_labels.
 
 <pre lang="markdown">
+
 imgs_bytes = _download_and_concat(img_prefix)
 labs_bytes = _download_and_concat(lbl_prefix)
 (...)
 imgs_np = _parse_idx_images(imgs_bytes)       # shape (N,28,28)
 labs_np = _parse_idx_labels(labs_bytes) 
+
 </pre>
 
 Infine, dai vari tensori numpy vengono creati i tensori pyTorch, pronti per essere utilizzati nel training del modello. 
