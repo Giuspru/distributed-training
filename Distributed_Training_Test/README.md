@@ -33,6 +33,7 @@ La funzione scarica i file in memoria e fornisce i contenuti combinati in un sin
 Inizialmente viene creato un dataset s3 con il metodo S3MapDataset.from_prefix(). Questo permentte di scaricare dati direttamente da un bucket compatibile con s3 ed usarli come un dataset pyTorch. 
 
 <pre lang="markdown">
+
     ds = S3MapDataset.from_prefix(
         prefix,
         region=REGION,
@@ -40,16 +41,19 @@ Inizialmente viene creato un dataset s3 con il metodo S3MapDataset.from_prefix()
         transform=None,
         s3client_config=s3_config
     )
+
 </pre>
 
 Viene formata una lista di coppie del tipo ```["my-bucket", "datasets/mnist/train/part-00001" ]```che viene filtrata per eliminare tutti i file che presentano l'estensione xl.meta (metadati), e successivamente viene ordinata alfabeticamente. 
 
 <pre lang="markdown">
+
     pairs = ds._dataset_bucket_key_pairs
     indices = sorted(
       [i for i, entry in enumerate(pairs) if not entry[1].endswith("xl.meta")],
       key=lambda i: pairs[i][1]
     )
+
 </pre>
 
 Per ogni elemento della lista "indices" viene aperto l'oggetto di quella lista, viene letto il contenuto e viene concatenato alla lista "buf". Di fatto quello che si sta facendo è una concatenazione di files binari in ram.
@@ -123,6 +127,127 @@ Infine, dai vari tensori numpy vengono creati i tensori pyTorch, pronti per esse
 Si aggiunge una dimensione al tensore di immagini, perchè pyTorch si aspetta un tensore di dimensione (batch_size, channels, height, width), e dato che le immagini sono in bianco e nero, channel dovrà essere pari ad 1.
 
 ### 6. train_loop_per_worker():
+Una volta creata la connessione con il bucket MINIO, in cui sono salvati i dati realtivi al dataset MNIST, e conclusa la parte di creazione del dataset da fornire al modello da allenare, si passa alla generazione del loop di addestramento distribuito. 
+
+La funzione **train_loop_per_worker()** è quella che permette di addestrare la rete neurale, splittando il dataset, e quindi il carico di lavoro sui vari workers che compongono il cluster. 
+
+Si parte con la definizione del device su cui verrà eseguito il training, in questo caso si opterà per il device CPU poichè il nostro cluster non presenta alcuna GPU.
+
+<pre lang="markdown">
+
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+
+</pre>
+
+Mediante la funzione **make_dataset()**, che è stata descritta precedentemente, viene creato il dataset di training (si noti l'argomento "train" che verrà utilizzato come split). 
+
+Grazie alla classe di PyTorch **DistributedSampler**, viene creato un sampler che permette di dividere il dataset in parti uguali tra i vari workers. Il suo scopo principale è suddividere automaticamente un dataset tra più processi (o worker) che partecipano a un training distribuito, in modo che ogni processo lavori su una parte diversa del dataset, senza sovrapposizione.
+Il numero di Workers viene definito dal numero di repliche descritto nel file di configurazione **raycluster.yaml**.l'informazione viene passata al codice mediante la variabile d'ambiernte "RAY_NUM_WORKERS".
+
+<pre lang="markdown">
+
+ds = make_dataset("train")
+sampler = DistributedSampler(ds)
+
+</pre>
+
+Il dataset pronto ad essere distribuito, viene poi passato alla funzione DataLader(), che come argomenti presenta il dataset stesso "ds" e il sampler creato precedentemente. In un training distribuito, ogni processo che viene avviato richiede il proprio DataLoader, ma tutti devono leggere dallo stesso dataset condiviso. Grazie a DistributedSampler ogni processo leggerà solo la parte dei dati che gli spetta.
+
+<pre lang="markdown">
+
+loader = DataLoader(ds, batch_size=cfg["bs"], sampler=sampler, shuffle=False, num_workers=int(os.getenv("RAY_NUM_WORKERS", 2)))
+
+</pre>
+
+A questo punto la funzione **prepare_data_loader()** che proviene dalla libreria ```ray.train.torch```, serve a prepare il DataLoader per l'ambiente distribuito di Ray Training.
+In particolare la funzione, verifica se è stato usato un DistributedSampler (altrimenti lo crea in automatico) e fa si che ogni processo ray gestisca il proprio Dataloader in modo corretto.
+
+<pre lang="markdown">
+
+loader = prepare_data_loader(loader)
+
+</pre>
+
+Successivamente anche il modello che verrà costruito dovrà essere preparato per il training distribuito. Per questo una volta definito "model" si utilizza la funzione **prepare_model()**.
+
+Tale funzione fornita da Ray Train trasforma un normale modello PyTorch in una versione pronta per il training distribuito, compatibile con l'ambiente Ray, dietro le quinte prepare_model() fa questo: 
+``` model = torch.nn.parallel.DistributedDataParallel(model, device_ids=[local_rank], ...) ```.
+In particolare DistributedDataParallel permette di eseguire 2 processi impoertanti che sono:
+
+- Backward pass e sincronizzazione dei gradienti in parallelo
+- Ogni processo addestra una copia del modello con i suoi dati, ma i gradienti vengono aggregati automaticamente.
+
+<pre lang="markdown">
+
+ model = nn.Sequential(
+        nn.Flatten(),
+        nn.Linear(28*28, 128), nn.ReLU(), nn.Dropout(0.2),
+        nn.Linear(128, 512), nn.ReLU(), nn.Dropout(0.2),
+        nn.Linear(512, 512), nn.ReLU(), nn.Dropout(0.2),
+        nn.Linear(512, 512), nn.ReLU(), nn.Dropout(0.2),
+        nn.Linear(512, 512), nn.ReLU(), nn.Dropout(0.2),
+        nn.Linear(512, 512), nn.ReLU(), nn.Dropout(0.2),
+        nn.Linear(512, 512), nn.ReLU(), nn.Dropout(0.2),
+        nn.Linear(512, 512), nn.ReLU(), nn.Dropout(0.2),
+        nn.Linear(512, 512), nn.ReLU(), nn.Dropout(0.2),
+        nn.Linear(512, 512), nn.ReLU(), nn.Dropout(0.2),
+        nn.Linear(512, 10)
+    ).to(device)
+
+    model = prepare_model(model)
+
+</pre>
+
+Definite la loss_function e il metodo di ottimzzazione, è possibile iniziare il ciclo di addestramento vero e prorpio. Questo viene eseguito per ciascun worker, ognuno dei quali vede solo una parte dei dati di MNIST. Tutto questo grazie a DistributedSampler. Ray invece gestisce in background la sincronizzazione dei pesi tra i vari workernodes dopo ogni backward.
+
+Dietro le quinte, ogni worker esegue questo stesso codice, ma su una diversa posizione del dataset. 
+Grazie a prepare_model(), il modello sincronizza i pesi iniziali ed allinea i gradienti tra i worker. Alla fine di ogni batch, i gradienti vengono combinati prima di aggiornare i pesi. 
+
+<pre lang="markdown">
+
+for epoch in range(cfg["epochs"]):
+        sampler.set_epoch(epoch) # WIP <-- questo serve per lo shuffling
+        for imgs, labels in loader:
+            imgs, labels = imgs.to(device), labels.to(device)
+            optimizer.zero_grad()
+            loss_fn(model(imgs), labels).backward()
+            optimizer.step()
+
+</pre>
+
+
+L'ultima parte della funzione è quella che gestisce il salvataggio del modello addestrato e il suo upload su un bucket S3.
+Inizialmente viene effettuata una verifica della presenza di un processo distribuito mediante ```dist.is_available() and dist.is_initialized()```, se entrambe le condzioni sono vere e quindi il training distribuito è attivo, viene salvato il valore del rank, ovvero l'indice del processo corrente. (rank 0 è il master node, mentre i rank 1 e oltre sono i worker nodes). 
+
+Per capire: il codice in questione viene effettuato in maniera distribuita su tutti i nodi. Ognuno di questi nodi ha un valore associato al rank, in poarticolare se mi trovo nel nodo master allora rank = 0 altrimenti rank = 1, 2, 3, ecc. 
+
+<pre lang="markdown">
+if dist.is_available() and dist.is_initialized():
+        rank = dist.get_rank()
+
+</pre>
+
+
+Solo il nodo che verifica ```dist.get_rank() == 0```proseguirà con il salvataggio del modello, mentre gli altri nodi non faranno nulla. Nello specifico il modello verrà salvato nella cartella temporanea ```/tmp/model/mnist.pt```.
+
+<pre lang="markdown">
+
+if rank == 0:
+        os.makedirs("/tmp/model", exist_ok=True)
+        model_path = "/tmp/model/mnist.pt"
+        torch.save(model.state_dict(), model_path)
+        print(f"✔ Model saved to {model_path}")
+
+</pre>
+
+
+L'ultimo step è l'upload del modello salvato su di un bucket S3.
+
+<pre lang="markdown">
+
+s3_client.upload_file(model_path, "models", "mnist/mnist.pt")
+
+</pre>
 
 ### 7. main();
 
