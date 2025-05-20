@@ -78,6 +78,6 @@ def test_model_local(data_dir=""):
             total += labels.size(0)
 
     acc = correct / total
-    print(f"✅ Test accuracy: {acc:.2%}")
+    print(f"Test accuracy: {acc:.2%}")
 
 test_model_local()
