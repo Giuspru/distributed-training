@@ -48,11 +48,11 @@ Viene formata una lista di coppie del tipo ```["my-bucket", "datasets/mnist/trai
 
 <pre lang="markdown">
 
-    pairs = ds._dataset_bucket_key_pairs
-    indices = sorted(
-      [i for i, entry in enumerate(pairs) if not entry[1].endswith("xl.meta")],
-      key=lambda i: pairs[i][1]
-    )
+pairs = ds._dataset_bucket_key_pairs
+indices = sorted(
+    [i for i, entry in enumerate(pairs) if not entry[1].endswith("xl.meta")],
+    key=lambda i: pairs[i][1]
+)
 
 </pre>
 
