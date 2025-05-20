@@ -18,7 +18,6 @@ Il codice esegue un addestramento distribuito di un modello neurale sulla base M
 S3_PREFIX = "s3://datasets/mninst" 
 ENDPOINT  = os.getenv("AWS_ENDPOINT_URL") 
 REGION    = os.getenv("AWS_REGION", "us-east-1")
-
 s3_config = S3ClientConfig(force_path_style=True)
 
 </pre>
