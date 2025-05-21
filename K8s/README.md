@@ -1,56 +1,85 @@
-# Introduzione:
-Il progetto "Distributed-Training" ha l’obiettivo di seguire tutti i passaggi necessari per addestrare un modello di rete neurale, distribuendo il processo di training su un cluster Kubernetes composto da più nodi.
-Nel progetto sono implementati tutti gli step fondamentali per distribuire un processo di machine learning su un cluster, partendo dalla configurazione infrastrutturale del cluster Kubernetes e del cluster Ray, passando per l’implementazione delle comunicazioni tra il cluster e un server MinIO esterno, fino ad arrivare alla fase di addestramento e validazione del modello di machine learning.
-
-L’infrastruttura del progetto è composta da:
- - Un cluster Kubernetes formato da 3 nodi: un nodo master e due nodi worker.
- - Un cluster Ray con 8 worker distribuiti sui due nodi worker del cluster Kubernetes.
- - Un server MinIO, responsabile della gestione del dataset MNIST e del modello addestrato.
-
- ![Logo del progetto](./img/img.png) 
-
-
  # Implementazione Infrastrutturale: 
+
  ## 1. Cluster Kubernetes:
  In prima istanza sono state create tre macchine virtuali su di un Server privato, con i seguenti hostname:
- - **masternode** (192.168.122.33) con: 10 CPUs & 22Gb di Ram
+ - **masternode** (192.168.122.33) con: 10 CPUs & 22Gb di RAM
  - **workernode1** (192.168.122.22) con: 8 CPUs & 17Gb di RAM
  - **workernode2** (192.168.122.94) con: 8 CPUs & 17Gb di RAM
 
 Il masternode svolgerà il ruolo di control plane del cluster Kubernetes, mentre i due nodi worker1 e worker2 ricopriranno il ruolo di workersnode.
 
 ### 1.1 Installazione di Kubernetes con rke2 & avvio del servizio:
-- Per installare Kubernetes sul cluster di macchine virtuali è stato utilizzato il tool rke2, dando il comando:  (spiegazione breve di rke2). 
-```curl -sfL https://get.rke2.io/ | INSTALL_RKE2_TYPE=server sh -```
+- Per installare Kubernetes sul cluster di macchine virtuali è stato utilizzato il tool **rke2**, dando il comando:
+
+<pre lang="markdown">
+
+curl -sfL https://get.rke2.io/ | INSTALL_RKE2_TYPE=server sh -
+
+</pre>
+
+In questo contesto, **RKE2** è stato scelto per semplificare l’installazione e la gestione del cluster Kubernetes sulle macchine virtuali, infatti questa tecnologia permette di include automaticamente componenti fondamentali come containerd, kube-proxy, kubelet, etcd e cni, fondamentali per la gestione del cluster.
+Nello specifico, l’uso del comando sopra consente di installare il nodo server principale del cluster, avviando automaticamente i servizi necessari per eseguire Kubernetes.
+
+
 
 - Per abilitare il servizio utilizzando rke2, e successivamente metterlo in atto vengono dati i due comandi: 
 
-    - ```systemctl enable rke2-server.service```
-    - ```systemctl start rke2-server.service```
+<pre lang="markdown">
 
-Una volta installato il servizio, il kubeconfig (spiegare cosa sia e a cosa serve) viene salvato nella directory seguente: ```/etc/rancher/rke2/rke2.yaml```
-E' necessario a questo punto esportare la variabile d'ambiente KUBECONFIG (perchè?) con il cpmando: 
+ systemctl enable rke2-server.service
+ systemctl start rke2-server.service
 
-- ```export KUBECONFIG=/etc/rancher/rke2/rke2.yaml```
+ </pre>
 
-Avendo esportato la variabile d'ambiente KUBECONFIG, è ora possibie eseguoire tutti i comandi di kubectl per interagire con il cluster senza dover specificare ogni volta il path del kubeconfig, passando da: 
 
-- ```/var/lib/rancher/rke2/bin/kubectl get nodes```
 
-a 
+Una volta completata l’installazione del servizio, il file di configurazione kubeconfig viene generato automaticamente e salvato nel percorso: 
+<pre lang="markdown">
 
-- ```kubectl get nodes```
+/etc/rancher/rke2/rke2.yaml
 
-In queto caso l'output ottenuto è il seguente: forsae qui è meglio metterci una piccola foto:
+</pre>
+
+Il kubeconfig è un file fondamentale che contiene tutte le informazioni necessarie per permettere al client kubectl di interagire con il cluster Kubernetes.
+Per consentire a kubectl di localizzare correttamente questo file senza doverne specificare il percorso ogni volta, è necessario esportare la variabile d’ambiente KUBECONFIG con il seguente comando:
+
+<pre lang="markdown">
+
+export KUBECONFIG=/etc/rancher/rke2/rke2.yaml
+
+</pre>
+
+In questo modo, kubectl utilizzerà automaticamente il file di configurazione specificato per eseguire comandi verso il cluster. Ciò consente di semplificare l’interazione con Kubernetes, passando da un comando esplicito come:
+
+<pre lang="markdown">
+
+/var/lib/rancher/rke2/bin/kubectl get nodes
+
+</pre>
+
+a un comando più semplice e diretto come:
+
+<pre lang="markdown">
+
+kubectl get nodes
+
+</pre>
+
+In queto caso l'output ottenuto è il seguente: [kubectl get nodes](./img/img3.png)
  ``` NAME STATUS ROLES AGE VERSION masternode0.localdomain Ready control-plane,etcd,master 17m v1.31.8+rke2r1 ```
 
-Come è possibile notare dall'output il nodo master è stato creato correttamente, ed è pronto all'uso come possiamo evincere dal suo status "ready".
+Il Masternode è stato creato correttamente ed è pronto all'uso. Questo lo si evince dallo stato "ready" riportato nell'immagine sopra.
 
-E' possibile andare a vedere tutti i PODs del cluster con il comando: 
+Mediante il comando: 
 
-- ```kubectl get pods -A```
-Ottenendo così il seguente output: 
- ![output1](./img/img.png) 
+<pre lang="markdown">
+
+kubectl get pods -A
+
+</pre>
+
+vengono mostrati tutti i pod in esecuzione nel cluster: [kubectl get pods -A](./img/img3.png)
+
 
 
 
