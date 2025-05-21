@@ -109,7 +109,10 @@ Il seguente comando consente di creare e scrivere direttamente il file config.ya
 
 <pre lang="markdown">
 
-sudo tee /etc/rancher/rke2/config.yaml 
+sudo tee /etc/rancher/rke2/config.yaml > /dev/null 
+server: https://192.168.122.33:9345
+token: K10aca9023f14ec740f69a6f15659aac21d56b8631d93f2b417c51111fd89e640cf::server:1a7560a20238099cd225b0aa3def7cb6
+EOF
 
 </pre>
 
