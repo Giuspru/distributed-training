@@ -154,25 +154,47 @@ Questo risultato non è affatto banale, poiché implica che la configurazione de
 
 
 ### 1.2 Installazione di Helm:
-Sul nodo control plane del cluster k8s installiamo helm (da dare una letta su cosa e')
+Sul nodo control plane del cluster Kubernetes, è necessario installare Helm, un tool fondamentale per la gestione delle applicazioni Kubernetes:
 
- <pre lang="markdown">curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3
+<pre lang="markdown">
+
+curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3
 chmod 700 get_helm.sh
 ./get_helm.sh
 
 </pre>
 
-Con helm installiamo il kuberay operator (da studiare): 
+Helm è un package manager per Kubernetes, analogo a strumenti come apt per Debian/Ubuntu o yum per CentOS. Consente di:
+
+- installare, aggiornare e gestire applicazioni complesse su Kubernetes tramite chart, ovvero pacchetti preconfigurati che includono risorse Kubernetes (Deployment, Service, ConfigMap, ecc.);
+- semplificare la distribuzione e il versionamento delle applicazioni;
+- astrarre la complessità della configurazione manuale attraverso l’uso di template YAML dinamici.
+
+Una volta installato Helm, possiamo utilizzarlo per installare il KubeRay Operator:
+
 <pre lang="markdown">
+
 helm repo add kuberay https://ray-project.github.io/kuberay-helm/
 helm repo update
 helm install kuberay-operator kuberay/kuberay-operator --version 1.3.0
+
 </pre>
 
-Completato il comando ed eseguendo di nuovo il comando per recupare i pods, vedermeo il pod che gestisce 
-il kuberay-operator: 
-immagine di output.
-![output1](./img/)
+KubeRay Operator è un componente sviluppato dal progetto Ray, pensato per facilitare la gestione e l’orchestrazione di cluster Ray all'interno di Kubernetes. Ray è un framework open-source per il calcolo distribuito, progettato per applicazioni scalabili di machine learning, data processing e AI.
+
+
+Completata l’installazione, è possibile verificare l’avvenuto deployment del KubeRay Operator eseguendo nuovamente il comando:
+
+<pre lang="markdown">
+
+kubectl get pods -n default
+
+</pre>
+
+Il risultato dovrebbe mostrare un output simile al seguente: [immagine da mettere](./img/img5.png)
+In esso è visibile il pod kuberay-operator in esecuzione, che indica che l’operator è attivo e pronto a gestire i cluster Ray all’interno dell’ambiente Kubernetes.
+
+
 
 
 # 2. Configurazione MinIO e caricamento del dataset MNIST:
