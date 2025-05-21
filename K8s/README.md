@@ -80,10 +80,7 @@ kubectl get pods -A
 
 vengono mostrati tutti i pod in esecuzione nel cluster: [immagine da mettere](./img/img3.png)
 
-
-
-
-## Installazione di rke2 sui nodi worker:
+## 2. Installazione di rke2 sui nodi worker:
 A questo punto è necessario installare rke2 sui nodi worker, (perchè? mi da delle migliorie?) eseguendo il comando: 
 
 ```curl -sfL https://get.rke2.io/ | INSTALL_RKE2_TYPE=agent sh -```
