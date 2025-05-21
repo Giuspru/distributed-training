@@ -109,10 +109,7 @@ Il seguente comando consente di creare e scrivere direttamente il file config.ya
 
 <pre lang="markdown">
 
-sudo tee /etc/rancher/rke2/config.yaml > /dev/null <<EOF
-server: https://192.168.122.33:9345
-token: K10aca9023f14ec740f69a6f15659aac21d56b8631d93f2b417c51111fd89e640cf::server:1a7560a20238099cd225b0aa3def7cb6
-EOF
+sudo tee /etc/rancher/rke2/config.yaml 
 
 </pre>
 
@@ -158,7 +155,9 @@ Sul nodo control plane del cluster k8s installiamo helm (da dare una letta su co
 
  <pre lang="markdown">curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3
 chmod 700 get_helm.sh
-./get_helm.sh</pre>
+./get_helm.sh
+
+</pre>
 
 Con helm installiamo il kuberay operator (da studiare): 
 <pre lang="markdown">
