@@ -33,7 +33,7 @@ Nello specifico, l’uso del comando sopra consente di installare il nodo server
 
 
 
-Una volta completata l’installazione del servizio, il file di configurazione kubeconfig viene generato automaticamente e salvato nel percorso: 
+- Una volta completata l’installazione del servizio, il file di configurazione kubeconfig viene generato automaticamente e salvato nel percorso: 
 <pre lang="markdown">
 
 /etc/rancher/rke2/rke2.yaml
@@ -65,7 +65,7 @@ kubectl get nodes
 
 </pre>
 
-In queto caso l'output ottenuto è il seguente: [kubectl get nodes](./img/img3.png)
+In queto caso l'output ottenuto è il seguente: [immagine da mettere](./img/img3.png)
  ``` NAME STATUS ROLES AGE VERSION masternode0.localdomain Ready control-plane,etcd,master 17m v1.31.8+rke2r1 ```
 
 Il Masternode è stato creato correttamente ed è pronto all'uso. Questo lo si evince dallo stato "ready" riportato nell'immagine sopra.
@@ -78,7 +78,7 @@ kubectl get pods -A
 
 </pre>
 
-vengono mostrati tutti i pod in esecuzione nel cluster: [kubectl get pods -A](./img/img3.png)
+vengono mostrati tutti i pod in esecuzione nel cluster: [immagine da mettere](./img/img3.png)
 
 
 
