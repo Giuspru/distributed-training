@@ -9,7 +9,7 @@ Per gestire in modo efficiente lo storage dei dati all’interno del progetto, a
 - Per l’installazione, è stata seguita la guida ufficiale disponibile al seguente repository GitHub: https://github.com/LucaPacioselli/MinIO-S3-setup/tree/main
 
 
-## 2.2 Caricamento del dataset MNIST:
+## 2.2 Download del dataset MNIST:
 
 Successivamente, si è provveduto a scaricare localmente il dataset MNIST, uno dei dataset di riferimento per il training e la validazione di modelli di classificazione di immagini scritte a mano. Il download è stato effettuato dal nodo master del cluster con i seguenti comandi:
 
@@ -33,8 +33,19 @@ Questi comandi:
 - scaricano i file compressi .gz contenenti immagini e etichette di training e test,e infine li decomprimono per ottenere i file .ubyte.
 
 
-## 2.3 Caricamento del dataset MNIST su MinIO:
-Per rendere il dataset disponibile in modo centralizzato, i file sono stati caricati su MinIO all'interno di un bucket chiamato **datasets**, utilizzando lo script Python chiamato buckethandler.py descritto approfonditamente nel README.md presente nella cartella **utils**.
+## 2.3  Caricamento del dataset MNIST su MinIO:
+Mediante i seguenti comandi:
+
+<pre lang="markdown">
+
+python3 buckethandler.py --endpoint https://minio.131.154.98.45.myip.cloud.infn.it --bucket datasets upload --file mnist/train-images-idx3-ubyte
+python3 buckethandler.py --endpoint https://minio.131.154.98.45.myip.cloud.infn.it --bucket datasets upload --file mnist/train-labels-idx1-ubyte
+python3 buckethandler.py --endpoint https://minio.131.154.98.45.myip.cloud.infn.it --bucket datasets upload --file mnist/t10k-images-idx3-ubyte
+python3 buckethandler.py --endpoint https://minio.131.154.98.45.myip.cloud.infn.it --bucket datasets upload --file mnist/t10k-labels-idx1-ubyte
+
+</pre>
+
+Il dataset è astato reso disponibile in modo centralizzato, i file sono stati caricati su MinIO all'interno di un bucket chiamato **datasets**, utilizzando lo script Python chiamato **buckethandler.py** descritto approfonditamente nel README.md presente nella cartella **utils**.
 
 
 
