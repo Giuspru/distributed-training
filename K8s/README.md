@@ -80,31 +80,77 @@ kubectl get pods -A
 
 vengono mostrati tutti i pod in esecuzione nel cluster: [immagine da mettere](./img/img3.png)
 
-## 2. Installazione di rke2 sui nodi worker:
-A questo punto è necessario installare rke2 sui nodi worker, (perchè? mi da delle migliorie?) eseguendo il comando: 
+### 1.2 Installazione di rke2 sui nodi worker:
 
-```curl -sfL https://get.rke2.io/ | INSTALL_RKE2_TYPE=agent sh -```
+A questo punto è necessario procedere con l’installazione di RKE2 anche sui nodi worker del cluster. Questo passaggio è fondamentale per consentire a tali nodi di unirsi correttamente al cluster e iniziare a eseguire i carichi di lavoro (i pod) orchestrati dal piano di controllo.
 
-Successivamente viene creata la cartella rke2: ```sudo mkdir -p /etc/rancher/rke2```
-e il file di configurazione config.yaml: 
+L’installazione sui nodi worker si effettua utilizzando il comando:
 
-``` sudo tee /etc/rancher/rke2/config.yaml > /dev/null <<EOF ````
+<pre lang="markdown">
 
+curl -sfL https://get.rke2.io/ | INSTALL_RKE2_TYPE=agent sh -
+
+</pre>
+
+In questo caso, la variabile d’ambiente **INSTALL_RKE2_TYPE=agent** indica che il nodo verrà configurato come **agente**, ovvero come **worker node**. A differenza del masternode, i worker non eseguono i componenti del control plane, ma si occupano esclusivamente di eseguire i container e le applicazioni distribuite dal cluster.
+
+Dopo l’installazione del componente agent, è necessario creare la directory di configurazione per RKE2:
+
+<pre lang="markdown">
+
+sudo mkdir -p /etc/rancher/rke2
+
+</pre>
+
+All’interno di questa directory verrà creato il file config.yaml, che conterrà i parametri essenziali per consentire al nodo worker di comunicare con il server del cluster, come ad esempio l’indirizzo del server API e il token di registrazione. La corretta configurazione di questo file è indispensabile per completare l’unione del nodo al cluster in modo sicuro ed efficace.
+
+
+Il seguente comando consente di creare e scrivere direttamente il file config.yaml con i parametri richiesti:
+
+<pre lang="markdown">
+
+sudo tee /etc/rancher/rke2/config.yaml > /dev/null <<EOF
 server: https://192.168.122.33:9345
 token: K10aca9023f14ec740f69a6f15659aac21d56b8631d93f2b417c51111fd89e640cf::server:1a7560a20238099cd225b0aa3def7cb6
-EOF ```
+EOF
+
+</pre>
+
+Questo comando crea il file di configurazione **config.yaml** che consente al nodo worker di:
+    - sapere a quale nodo server connettersi per unirsi al cluster RKE2;
+    - autenticarsi in modo sicuro utilizzando un token generato dal masternode.
+È un passaggio cruciale per completare correttamente l’aggiunta del nodo worker al cluster Kubernetes gestito con RKE2.
 
 
-Creato il file, e' necessario abilitare rke2 agent e farlo partire: 
+Una volta creato il file di configurazione config.yaml, è necessario abilitare e avviare il servizio RKE2 in modalità agent sul nodo worker. Questo viene fatto tramite i seguenti comandi:
 
-- ``` systemctl enable rke2-agent.service ```
-- ``` systemctl start rke2-agent.service ```
+<pre lang="markdown">
 
-Tornando sul control plane possiamo vedere i nodi del cluster: 
- ![output1](./img/)  immagine dei vari nodi:
+sudo systemctl enable rke2-agent.service
+sudo systemctl start rke2-agent.service
 
- Che sono entrambi Ready (NON banale, perche' rke2 si occupa anche della configurazione della rete)
-In questo caso, rke2 utilizza Canal come plugin di rete. 
+</pre>
+
+- Il comando **enable** assicura che il servizio venga avviato automaticamente ad ogni riavvio del sistema.
+- Il comando **start** avvia immediatamente il servizio, consentendo al nodo di tentare la connessione al control plane.
+
+
+Dopo aver avviato con successo il servizio rke2-agent, è possibile tornare sul nodo control plane e utilizzare kubectl per verificare lo stato dei nodi che compongono il cluster:
+
+<pre lang="markdown">
+
+kubectl get nodes
+
+</pre>
+
+A questo punto, si dovrebbe visualizzare un output simile al seguente: [immagine da mettere](./img/img4.png)
+
+Entrambi i nodi risultano nello stato "Ready", il che indica:
+- la comunicazione tra i nodi è avvenuta correttamente,
+- i componenti fondamentali del nodo worker (kubelet, container runtime, plugin di rete, ecc.) sono operativi,
+- il cluster è in grado di schedulare e gestire i carichi di lavoro in modo distribuito.
+
+Questo risultato non è affatto banale, poiché implica che la configurazione della rete tra i nodi è stata effettuata con successo. Uno degli aspetti più delicati in un cluster Kubernetes è infatti proprio la corretta configurazione del networking pod-to-pod e node-to-node.
 
 
 ### 1.2 Installazione di Helm:
