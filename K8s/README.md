@@ -65,8 +65,7 @@ kubectl get nodes
 
 </pre>
 
-In queto caso l'output ottenuto è il seguente: [immagine da mettere](./img/img3.png)
- ``` NAME STATUS ROLES AGE VERSION masternode0.localdomain Ready control-plane,etcd,master 17m v1.31.8+rke2r1 ```
+In queto caso l'output ottenuto è il seguente: [nodes](../img/img4.png)
 
 Il Masternode è stato creato correttamente ed è pronto all'uso. Questo lo si evince dallo stato "ready" riportato nell'immagine sopra.
 
