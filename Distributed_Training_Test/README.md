@@ -276,11 +276,13 @@ La distribuzione del training sui diversi nodi è gestita da **ScalingConfig**, 
 </pre>
 
 ## Test del modello:
-Una volta concluso il trainig distribuito, il modello addestrato viene caricato in automatico nel bucket MINIO s3. 
+Una volta completato il training distribuito, il modello addestrato viene automaticamente caricato nel bucket S3 di MINIO.
 
-Prima di runnare il codice che verifichi la capacità di predizione del modello, facendogli fare predizioni sul dataset di test, è necessario scaricare il modello da S3 in locale. Così che successivamente, runnando il file **test_model.py** si possa utilizzare il modello per fare predizioni.
+Prima di eseguire il codice per verificare la capacità predittiva del modello — effettuando quindi inferenze sul dataset di test — è necessario scaricare localmente il modello dal bucket S3. Questo passaggio è fondamentale affinché il file test_model.py possa accedere al modello e utilizzarlo per effettuare le predizioni.
 
-Per fare questo vengono eseguiti due comandi racchiusi in uno script bash chiamato **download_trained_model.sh**. Questo script scarica il modello dal bucket S3 e lo salva localmente in una cartella temporanea ```mnist/mnist.pt``` da cui viene successivamente spostato il modello nella repository corrente.
+Per eseguire questa operazione, si utilizza uno script bash denominato **download_trained_model.sh**, il quale esegue due comandi fondamentali. Il primo consente di scaricare il file del modello dal bucket S3, salvandolo temporaneamente nella directory ```mnist/mnist.pt.``` Il secondo comando provvede a spostare il file nella directory di lavoro corrente.
+
+I comandi eseguiti dallo script sono i seguenti:
 
 <pre lang="markdown">
 
@@ -290,7 +292,7 @@ mv mnist/mnist.pt mnist.pt
 
 </pre>
 
-Una volta ottenuto il modello, con il comando:
+Una volta che il modello è stato scaricato e reso disponibile localmente, è possibile eseguire il comando seguente per avviare la fase di test:
 
 <pre lang="markdown">
 
@@ -298,5 +300,9 @@ python3 run_test.py
 
 </pre>
 
-viene utilizzato il modello allenato in maniera distribuita per fare predizioni sul dataset di test.
-L'output del test dovrebbe essere una cosa simile alla seguente: ![test_output.txt](../img/img7.png)
+Questo comando utilizza il modello, addestrato in modalità distribuita, per effettuare predizioni sul dataset di test. L'output del test dovrebbe essere simile al seguente: ![test_output.txt](../img/img7.png)
+
+
+
+
+
