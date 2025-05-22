@@ -77,7 +77,7 @@ kubectl get pods -A
 
 </pre>
 
-vengono mostrati tutti i pod in esecuzione nel cluster: ![immagine da mettere](../img/img5.png)
+vengono mostrati tutti i pod in esecuzione nel cluster: ![immagine da mettere](../img/img6.png)
 
 ### 1.2 Installazione di rke2 sui nodi worker:
 
@@ -142,7 +142,7 @@ kubectl get nodes
 
 </pre>
 
-A questo punto, si dovrebbe visualizzare un output simile al seguente: [immagine da mettere](./img/img4.png)
+A questo punto, si dovrebbe visualizzare un output simile al seguente: ![immagine da mettere](../img/img5.png)
 
 Entrambi i nodi risultano nello stato "Ready", il che indica:
 - la comunicazione tra i nodi è avvenuta correttamente,
