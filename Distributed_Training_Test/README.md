@@ -276,4 +276,27 @@ La distribuzione del training sui diversi nodi è gestita da **ScalingConfig**, 
 </pre>
 
 ## Test del modello:
+Una volta concluso il trainig distribuito, il modello addestrato viene caricato in automatico nel bucket MINIO s3. 
 
+Prima di runnare il codice che verifichi la capacità di predizione del modello, facendogli fare predizioni sul dataset di test, è necessario scaricare il modello da S3 in locale. Così che successivamente, runnando il file **test_model.py** si possa utilizzare il modello per fare predizioni.
+
+Per fare questo vengono eseguiti due comandi racchiusi in uno script bash chiamato **download_trained_model.sh**. Questo script scarica il modello dal bucket S3 e lo salva localmente in una cartella temporanea ```mnist/mnist.pt``` da cui viene successivamente spostato il modello nella repository corrente.
+
+<pre lang="markdown">
+
+python3 buckethandler.py --endpoint  https://minio.131.154.98.45.myip.cloud.infn.it --bucket models download --file mnist/mnist.pt
+
+mv mnist/mnist.pt mnist.pt
+
+</pre>
+
+Una volta ottenuto il modello, con il comando:
+
+<pre lang="markdown">
+
+python3 run_test.py
+
+</pre>
+
+viene utilizzato il modello allenato in maniera distribuita per fare predizioni sul dataset di test.
+L'output del test dovrebbe essere una cosa simile alla seguente: ![test_output.txt](./img/img7.png)
