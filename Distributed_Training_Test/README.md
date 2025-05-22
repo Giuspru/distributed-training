@@ -302,6 +302,14 @@ python3 run_test.py
 
 Questo comando utilizza il modello, addestrato in modalità distribuita, per effettuare predizioni sul dataset di test. L'output del test dovrebbe essere simile al seguente: ![test_output.txt](../img/img7.png)
 
+È importante sottolineare che l’obiettivo principale di questo progetto non è ottenere un modello altamente performante in termini di accuratezza, ma piuttosto dimostrare la corretta esecuzione di un processo di training distribuito su cluster.
+
+Come si può osservare dall’output, il modello presenta una bassa accuratezza sul dataset di test, il che è indicativo di un caso estremo di overfitting. Questo comportamento è dovuto alla struttura del modello utilizzato, che è molto profonda e contiene un numero elevato di hidden layers. Tale configurazione porta il modello a memorizzare il dataset di training, senza riuscire a generalizzare su dati non visti.
+
+L’impiego di una rete così profonda non è stato scelto per finalità prestazionali, bensì per finalità dimostrative: grazie alla sua complessità, è stato possibile osservare in maniera chiara e misurabile le differenze nei tempi di addestramento tra un cluster con soli 2 worker e uno con 8 worker. ![test_output.txt](../img/img3.png) 
+
+In questo modo, si è potuto evidenziare l’impatto della parallelizzazione sull'efficienza del training, che rappresenta il vero fulcro dell’intero esperimento.
+
 
 
 
