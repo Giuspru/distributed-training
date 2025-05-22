@@ -77,7 +77,7 @@ kubectl get pods -A
 
 </pre>
 
-vengono mostrati tutti i pod in esecuzione nel cluster: ![immagine da mettere](./img/img5.png)
+vengono mostrati tutti i pod in esecuzione nel cluster: ![immagine da mettere](../img/img5.png)
 
 ### 1.2 Installazione di rke2 sui nodi worker:
 
