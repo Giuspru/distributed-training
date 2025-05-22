@@ -65,7 +65,7 @@ kubectl get nodes
 
 </pre>
 
-In queto caso l'output ottenuto è il seguente: [nodes](../img/img4.png)
+In queto caso l'output ottenuto è il seguente: ![nodes](../img/img4.png)
 
 Il Masternode è stato creato correttamente ed è pronto all'uso. Questo lo si evince dallo stato "ready" riportato nell'immagine sopra.
 
