@@ -299,4 +299,4 @@ python3 run_test.py
 </pre>
 
 viene utilizzato il modello allenato in maniera distribuita per fare predizioni sul dataset di test.
-L'output del test dovrebbe essere una cosa simile alla seguente: ![test_output.txt](./img/img7.png)
+L'output del test dovrebbe essere una cosa simile alla seguente: ![test_output.txt](../img/img7.png)
