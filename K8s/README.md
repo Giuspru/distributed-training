@@ -190,7 +190,7 @@ kubectl get pods -n default
 
 </pre>
 
-Il risultato dovrebbe mostrare un output simile al seguente: [immagine da mettere](./img/img5.png)
+Il risultato dovrebbe mostrare un output simile al seguente: ![immagine da mettere](../img/img8.png)
 In esso è visibile il pod kuberay-operator in esecuzione, che indica che l’operator è attivo e pronto a gestire i cluster Ray all’interno dell’ambiente Kubernetes.
 
 
