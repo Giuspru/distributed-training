@@ -1,4 +1,3 @@
-
 ![Logo del progetto](../img/img1.png) 
 # Introduzione
 
