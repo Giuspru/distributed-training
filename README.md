@@ -1,3 +1,4 @@
+
 # Introduzione:
 Il progetto **"Distributed-Training"** ha l’obiettivo di seguire tutti i passaggi necessari per addestrare un modello di rete neurale, **distribuendo il processo di training su un cluster Kubernetes composto da più nodi**.
 
