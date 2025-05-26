@@ -49,7 +49,7 @@ Il dataset è astato reso disponibile in modo centralizzato, i file sono stati c
 
 
 
-# 3. Accesso dei pod al cluster kubernetes:
+# 3. Accesso dei pod del cluster kubernetes al server MinIO:
 
 Per permettere ai pod all’interno del cluster Kubernetes di accedere al server MinIO in modo sicuro, è stato creato un secret contenente le credenziali d’accesso:
 
