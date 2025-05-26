@@ -1,4 +1,6 @@
 **Un esempio dei dati di test del MNIST**
+
+
 ![Logo del progetto](../img/img2.png) 
 
 La base di dati MNIST (**modified National Institute of Standards and Technology database**) è una vasta base di dati di cifre scritte a mano che è comunemente impiegata come insieme di addestramento in vari sistemi per l'elaborazione delle immagini. La base di dati è anche impiegata come insieme di addestramento e di test nel campo dell'apprendimento automatico ed è stata creata rimescolando le immagini presenti nell'insieme di dati del NIST.
