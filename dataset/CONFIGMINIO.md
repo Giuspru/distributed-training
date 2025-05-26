@@ -1,3 +1,4 @@
+
 # 2. Configurazione MinIO e caricamento del dataset MNIST:
 
 ## 2.1 Installazione e configurazione server MinIO
