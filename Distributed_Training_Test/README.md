@@ -57,7 +57,8 @@ indices = sorted(
 </pre>
 
 Per ogni elemento della lista "indices" viene aperto l'oggetto di quella lista, viene letto il contenuto e viene concatenato alla lista "buf". Di fatto quello che si sta facendo è una concatenazione di files binari in ram.
-NB: Il motivo per cui viene fatta questa cosa, è che in molti casi datasets di grandi dimensioni vengono splittati in più parti nel bucket MINIO. Questa funzione serve per ricostruite il file binario originale così da lavorarci direttamente. (nel nostro caso non serve).
+
+**NB: Il motivo per cui viene fatta questa cosa, è che in molti casi datasets di grandi dimensioni vengono splittati in più parti nel bucket MINIO. Questa funzione serve per ricostruite il file binario originale così da lavorarci direttamente. (nel nostro caso non serve).**
 
 
 
