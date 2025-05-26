@@ -2,7 +2,7 @@
 
 ## 2.1 Installazione e configurazione server MinIO
 
-Per gestire in modo efficiente lo storage dei dati all’interno del progetto, abbiamo configurato un server MinIO, un sistema di storage compatibile con lo standard Amazon S3, che offre un’interfaccia per la memorizzazione e il recupero di oggetti.
+Per gestire in modo efficiente lo storage dei dati all’interno del progetto, abbiamo configurato un **server MinIO**, **un sistema di storage compatibile con lo standard Amazon S3**, che offre un’interfaccia per la memorizzazione e il recupero di oggetti.
 
 - MinIO è stato installato su una macchina virtuale separata (ospitata sul cloud INFN) dotata di IP pubblico:
 131.154.98.45
@@ -11,7 +11,7 @@ Per gestire in modo efficiente lo storage dei dati all’interno del progetto, a
 
 ## 2.2 Download del dataset MNIST:
 
-Successivamente, si è provveduto a scaricare localmente il dataset MNIST, uno dei dataset di riferimento per il training e la validazione di modelli di classificazione di immagini scritte a mano. Il download è stato effettuato dal nodo master del cluster con i seguenti comandi:
+Successivamente, si è provveduto a scaricare localmente il dataset MNIST, uno dei dataset di riferimento per il training e la validazione di modelli di classificazione di immagini scritte a mano. Il download è stato effettuato dal **nodo master** del cluster con i seguenti comandi:
 
 <pre lang="markdown">
 
@@ -29,8 +29,8 @@ gunzip *.gz
 </pre>
 
 Questi comandi:
-- creano una cartella mnist/,
-- scaricano i file compressi .gz contenenti immagini e etichette di training e test,e infine li decomprimono per ottenere i file .ubyte.
+- creano una cartella **mnist/**
+- scaricano i file compressi .gz contenenti immagini e etichette di training e test,e infine li decomprimono per ottenere i file **.ubyte.**
 
 
 ## 2.3  Caricamento del dataset MNIST su MinIO:
