@@ -43,6 +43,8 @@ Monta le credenziali da un Secret Kubernetes chiamato minio-credentials per l'ac
 
 # service-account.yaml
 
+![Logo del progetto](../img/service.png)
+
 Service Account Manifest - service-account.yaml
 Questo file service-account.yaml definisce una ServiceAccount Kubernetes chiamata ray, creata nel namespace default. Si tratta di un componente fondamentale per consentire a pod specifici (in questo caso, i nodi del cluster Ray) di interagire in modo sicuro con l’API server di Kubernetes e accedere a risorse del cluster in base ai permessi assegnati.
 Di seguito cosa fa nello specifico il manifest:
