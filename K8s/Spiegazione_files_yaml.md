@@ -2,6 +2,8 @@
 
 # raycluster.yaml:
 
+![Logo del progetto](./img/raycluser.png)
+
 Questo file raycluster.yaml è un manifest Kubernetes che definisce la configurazione di un Ray Cluster distribuito per l’esecuzione di carichi di lavoro in ambiente containerizzato, come il training distribuito di modelli di machine learning. In particolare, è pensato per essere utilizzato nel contesto di un progetto di training basato su Ray e MinIO.
 
 Di seguito cosa fa nello specifico il manifest: 
@@ -21,6 +23,9 @@ Service Account:
 Il nodo head utilizza un ServiceAccount chiamato ray, il quale può essere configurato con i permessi necessari per accedere ad altri servizi nel cluster.
 
 # rayjob.yaml
+
+![Logo del progetto](./img/rayjob.png)
+
 Questo file è un manifest Kubernetes che definisce un oggetto di tipo RayJob, utilizzato per eseguire automaticamente un job Ray all’interno di un cluster Ray già attivo. In questo caso specifico, il job avvia un training sul dataset MNIST utilizzando uno script Python presente nell'immagine Docker.
 
 Di seguito cosa fa nello specifico il manifest:
