@@ -13,6 +13,8 @@ L’infrastruttura del progetto è composta da:
 Il modello di machine learning sarà addestrato utilizzando i dati presenti nel dataset MNIST, archiviati all'interno del bucket MINIO. Una volta completato l'addestramento, il modello risultante verrà scaricato in locale dal bucket. Successivamente, ne verrà valutata l’accuratezza impiegando i dati di test, anch’essi scaricati dal server MINIO.
 
 
+
+
  ![Logo del progetto](./img/img.png) 
 
 
